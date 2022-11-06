@@ -2,12 +2,14 @@ import React, { useRef, useEffect, useCallback, useState } from "react";
 import styled from "styled-components";
 import { MdClose } from "react-icons/md";
 import { TableComponent } from "./TableComponent";
+import { LoadingComponent } from "./LoadingComponent";
 
 import axios from "axios";
 
 export const Modal = ({ showModal, setShowModal, arrayItems, id }) => {
   const modalRef = useRef();
   const [ObjectBundle, setObjectBundle] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const closeModal = (e) => {
     if (modalRef.current === e.target) {
@@ -28,14 +30,17 @@ export const Modal = ({ showModal, setShowModal, arrayItems, id }) => {
 
   useEffect(() => {
     if (arrayItems.length > 0 && showModal) {
+      setLoading(true);
       for (let i = 0; i < arrayItems.length; i++) {
         let element = arrayItems[i];
         axios
           .get(element)
           .then((res) => {
             setObjectBundle((prevState) => [...prevState, res.data]);
+            setLoading(false);
           })
           .catch((err) => {
+            setLoading(false);
             console.log(err);
           });
       }
@@ -87,7 +92,11 @@ export const Modal = ({ showModal, setShowModal, arrayItems, id }) => {
       {showModal ? (
         <Background onClick={closeModal} ref={modalRef}>
           <ModalWrapper showModal={showModal}>
-            <ModalContent>{renderDataModal(id)}</ModalContent>
+            {loading ? (
+              <LoadingComponent />
+            ) : (
+              <ModalContent>{renderDataModal(id)}</ModalContent>
+            )}
             <CloseModalButton
               aria-label="Close modal"
               onClick={() => setShowModal((prev) => !prev)}
@@ -127,8 +136,6 @@ const ModalContent = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
-  /* justify-content: center; */
-
   align-items: center;
   flex-direction: column;
   line-height: 1.8;
