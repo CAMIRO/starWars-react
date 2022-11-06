@@ -1,23 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
+import { List } from "./components/List";
+import { GlobalStyle } from "./globalStyles";
 function App() {
+  const [people, setPeople] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("https://swapi.dev/api/people")
+      .then((res) => {
+        setPeople(res.data.results);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <List people={people} />
+      <GlobalStyle />
     </div>
   );
 }
